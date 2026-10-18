@@ -107,7 +107,7 @@ function parseToISOString(s: string) {
 
 function isValueObject(value: Record<string, unknown>) {
   for (const key of primitiveKeys) {
-    if (value[key]) {
+    if (value[key] != null) {
       return true;
     }
   }

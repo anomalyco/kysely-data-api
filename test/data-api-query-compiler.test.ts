@@ -165,6 +165,24 @@ it("object (value object (primitives))", () => {
   }
 });
 
+it("object (value object (falsy primitives))", () => {
+  const inputs = {
+    booleanValue: false,
+    doubleValue: 0,
+    longValue: 0,
+    stringValue: "",
+  };
+  for (const [key, value] of Object.entries(inputs)) {
+    const result = db
+      .selectFrom("person")
+      .selectAll()
+      .where(ref("foo"), "=", { value: { [key]: value } })
+      .compile();
+    expect(result.sql).toEqual(`select * from "person" where "foo" = :0`);
+    expect(result.parameters).toEqual([{ name: "0", value: { [key]: value } }]);
+  }
+});
+
 it("object (value object (arrays))", () => {
   const inputs = {
     booleanValues: [true, false],
