@@ -8,6 +8,12 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
+permissions:
+  contents: write
+  pull-requests: write
+  # npm trusted publishing (OIDC)
+  id-token: write
+
 jobs:
   release:
     name: Release
@@ -19,9 +25,13 @@ jobs:
 
       - name: Setup Node.js
         # https://github.com/actions/setup-node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: 16.x
+          node-version: 22.x
+
+      - name: Upgrade npm
+        # trusted publishing needs npm 11.5.1+
+        run: npm install -g npm@latest
 
       - uses: pnpm/action-setup@v2
         with:
@@ -54,7 +64,6 @@ jobs:
           publish: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: View outputs
         run: echo ${{join(steps.changesets.outputs.*, ' ')}}
